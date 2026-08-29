@@ -116,7 +116,6 @@ class MeteoOpenMeteo:
     
     def get_weather_code(self, current):
         """Détermine le code météo WMO"""
-        # Approximation basée sur les données disponibles
         if current.get("precipitation", 0) > 5:
             return 61  # Pluie
         elif current.get("precipitation", 0) > 0:
@@ -129,7 +128,7 @@ class MeteoOpenMeteo:
             return 0   # Clair
     
     def get_weather_description(self, code):
-        """Traduit le code WMO en description [citation:8]"""
+        """Traduit le code WMO en description"""
         descriptions = {
             0: "Ciel dégagé",
             1: "Principalement dégagé",
@@ -311,16 +310,17 @@ def main():
     with col4:
         st.metric("🌧️ Pluie totale", f"{weather_df['precipitation'].sum():.1f} mm")
     
-    # Carte
+    # Carte - Correction : utilisation de scatter_map (remplace scatter_mapbox)
     st.markdown("### 🗺️ Carte des températures")
-    fig = px.scatter_mapbox(
+    fig = px.scatter_map(
         weather_df, lat="lat", lon="lon", color="temperature",
         size="wind_speed", hover_name="commune",
         hover_data={"temperature": ":.1f°C", "humidity": ":.0f%", "condition": True},
         color_continuous_scale="RdYlBu_r", zoom=9,
-        center={"lat": -21.1, "lon": 55.5}, height=450
+        center={"lat": -21.1, "lon": 55.5}, height=450,
+        map_style="open-street-map"  # Remplace mapbox_style
     )
-    fig.update_layout(mapbox_style="open-street-map", margin={"r":0, "t":0, "l":0, "b":0})
+    fig.update_layout(margin={"r":0, "t":0, "l":0, "b":0})
     st.plotly_chart(fig, use_container_width=True)
     
     # Grille des communes
